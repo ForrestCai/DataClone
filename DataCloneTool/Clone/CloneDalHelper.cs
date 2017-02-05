@@ -11,6 +11,8 @@ namespace DataCloneTool
 {
     public static class CloneDalHelper
     {
+
+
         public static string GetColumNameAndTypeList(string tableName)
         {
             string result = string.Empty;
