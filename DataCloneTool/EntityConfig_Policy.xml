@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EntityConfig>
+  <Entities>
+    <Entity Name="Policy" TableName="WP_Web_Policy" IdentityColumnName="WP_lPolicy_Id">
+    </Entity>
+    <Entity Name="PolicyRate" TableName="WP_Web_Policy_Rate" IdentityColumnName="WP_lRate_Id">
+      <References>
+        <Reference OwnColumnName="WP_lPolicy_Id" ReferredEntityName="Policy" ReferredColumnName="WP_lPolicy_Id"/>
+      </References>
+    </Entity>
+    <Entity Name="AirCondition" TableName="WP_Web_Policy_Air_Conditions" IdentityColumnName="WP_lAir_Condition_Id">
+      <References>
+        <Reference OwnColumnName="WP_lPolicy_Id" ReferredEntityName="Policy" ReferredColumnName="WP_lPolicy_Id"/>
+      </References>
+    </Entity>
+    <Entity Name="AirConditionPaxTypeCode" TableName="WP_Web_Policy_Air_Pax_Type_Code" IdentityColumnName="WP_lID">
+      <References>
+        <Reference OwnColumnName="WP_lAir_Condition_ID" ReferredEntityName="AirCondition" ReferredColumnName="WP_lAir_Condition_Id"/>
+      </References>
+    </Entity>
+    <Entity Name="PolicyAir" TableName="WP_Web_Policy_Air" IdentityColumnName="WP_lAir_Id">
+      <References>
+        <Reference OwnColumnName="WP_lPolicy_Id" ReferredEntityName="Policy" ReferredColumnName="WP_lPolicy_Id"/>
+      </References>
+    </Entity>
+    <Entity Name="City" TableName="CD_City" IdentityColumnName="CD_lCity_Code" Global="true" UniqueColumnName="CD_sCity">
+      <SelectCondition>
+        CD_lCity_Code in (select distinct WP_lCity_Code from WP_Web_Policy_City
+        inner join WP_Web_Policy_Air on WP_Web_Policy_Air.WP_lAir_Id = WP_Web_Policy_City.WP_lLink_Id
+        inner join WP_Web_Policy on WP_Web_Policy.WP_lPolicy_Id = WP_Web_Policy_Air.WP_lPolicy_Id
+        where WP_Web_Policy_City.WP_nLink_Option = 4 and WP_Web_Policy_Air.WP_lPolicy_Id = {0}
+        union
+        select distinct WP_lCity_Code from WP_Web_Policy_City
+        inner join WP_Web_Policy_Air_Conditions on WP_Web_Policy_Air_Conditions.WP_lAir_Condition_Id = WP_Web_Policy_City.WP_lLink_Id
+        inner join WP_Web_Policy on WP_Web_Policy.WP_lPolicy_Id = WP_Web_Policy_Air_Conditions.WP_lPolicy_Id
+        where WP_Web_Policy_City.WP_nLink_Option in (6,7) and WP_Web_Policy.WP_lPolicy_Id = {0}
+        union
+        select distinct WP_lCity_Code from WP_Web_Policy_City
+        inner join WP_Web_Policy_Land on WP_Web_Policy_Land.WP_lLand_Id = WP_Web_Policy_City.WP_lLink_Id
+        inner join WP_Web_Policy on WP_Web_Policy.WP_lPolicy_Id = WP_Web_Policy_Land.WP_lPolicy_Id
+        where WP_Web_Policy_City.WP_nLink_Option in (1,2) and WP_Web_Policy.WP_lPolicy_Id = {0}
+        union
+        select distinct WP_lCity_Code from WP_Web_Policy_City
+        inner join WP_Web_Policy_Land on WP_Web_Policy_Land.WP_lLand_Id = WP_Web_Policy_City.WP_lLink_Id
+        inner join WP_Web_Policy as LandPolicy on LandPolicy.WP_lPolicy_Id = WP_Web_Policy_Land.WP_lPolicy_Id
+        inner join WP_Web_Policy_Air_Land on WP_Web_Policy_Air_Land.WP_lWeb_Land_Policy = LandPolicy.WP_lPolicy_Id
+        inner join WP_Web_Policy as AirPolicy on AirPolicy.WP_lPolicy_Id = WP_Web_Policy_Air_Land.WP_lPolicy_Id
+        where WP_Web_Policy_City.WP_nLink_Option in (1,2) and AirPolicy.WP_lPolicy_Id = {0})
+      </SelectCondition>
+    </Entity>
+    <Entity Name="AirPolicyCity" TableName="WP_Web_Policy_City" IdentityColumnName="WP_lLandCity_ID">
+      <References>
+        <Reference OwnColumnName="WP_lPolicy_Id" ReferredEntityName="Policy" ReferredColumnName="WP_lPolicy_Id"/>
+        <Reference OwnColumnName="WP_lLink_Id" ReferredEntityName="PolicyAir" ReferredColumnName="WP_lAir_Id"/>
+        <Reference OwnColumnName="WP_lCity_Code" ReferredEntityName="City" ReferredColumnName="CD_lCity_Code"/>
+      </References>
+      <Restrictions>
+        <Restriction ColumnName="WP_nLink_Option" Value="4"/>
+      </Restrictions>
+    </Entity>
+    <Entity Name="AirConditionCity1" TableName="WP_Web_Policy_City" IdentityColumnName="WP_lLandCity_ID">
+      <References>
+        <Reference OwnColumnName="WP_lPolicy_Id" ReferredEntityName="Policy" ReferredColumnName="WP_lPolicy_Id"/>
+        <Reference OwnColumnName="WP_lLink_Id" ReferredEntityName="AirCondition" ReferredColumnName="WP_lAir_Condition_Id"/>
+        <Reference OwnColumnName="WP_lCity_Code" ReferredEntityName="City" ReferredColumnName="CD_lCity_Code"/>
+      </References>
+      <Restrictions>
+        <Restriction ColumnName="WP_nLink_Option" Value="6"/>
+      </Restrictions>
+    </Entity>
+    <Entity Name="AirConditionCity2" TableName="WP_Web_Policy_City" IdentityColumnName="WP_lLandCity_ID">
+      <References>
+        <Reference OwnColumnName="WP_lPolicy_Id" ReferredEntityName="Policy" ReferredColumnName="WP_lPolicy_Id"/>
+        <Reference OwnColumnName="WP_lLink_Id" ReferredEntityName="AirCondition" ReferredColumnName="WP_lAir_Condition_Id"/>
+        <Reference OwnColumnName="WP_lCity_Code" ReferredEntityName="City" ReferredColumnName="CD_lCity_Code"/>
+      </References>
+      <Restrictions>
+        <Restriction ColumnName="WP_nLink_Option" Value="7"/>
+      </Restrictions>
+    </Entity>
+    <Entity Name="LandCondition" TableName="WP_Web_Policy_Land" IdentityColumnName="WP_lLand_Id">
+      <References>
+        <Reference OwnColumnName="WP_lPolicy_Id" ReferredEntityName="Policy" ReferredColumnName="WP_lPolicy_Id"/>
+      </References>
+    </Entity>
+    <Entity Name="HotelCity" TableName="WP_Web_Policy_City" IdentityColumnName="WP_lLandCity_ID">
+      <References>
+        <Reference OwnColumnName="WP_lPolicy_Id" ReferredEntityName="Policy" ReferredColumnName="WP_lPolicy_Id"/>
+        <Reference OwnColumnName="WP_lLink_Id" ReferredEntityName="LandCondition" ReferredColumnName="WP_lLand_Id"/>
+        <Reference OwnColumnName="WP_lCity_Code" ReferredEntityName="City" ReferredColumnName="CD_lCity_Code"/>
+      </References>
+      <Restrictions>
+        <Restriction ColumnName="WP_nLink_Option" Value="5"/>
+      </Restrictions>
+    </Entity>
+    <Entity Name="CarCity" TableName="WP_Web_Policy_City" IdentityColumnName="WP_lLandCity_ID">
+      <References>
+        <Reference OwnColumnName="WP_lPolicy_Id" ReferredEntityName="Policy" ReferredColumnName="WP_lPolicy_Id"/>
+        <Reference OwnColumnName="WP_lLink_Id" ReferredEntityName="LandCondition" ReferredColumnName="WP_lLand_Id"/>
+        <Reference OwnColumnName="WP_lCity_Code" ReferredEntityName="City" ReferredColumnName="CD_lCity_Code"/>
+      </References>
+      <Restrictions>
+        <Restriction ColumnName="WP_nLink_Option" Value="2"/>
+      </Restrictions>
+    </Entity>
+    <Entity Name="SubLandPolicy" TableName="WP_Web_Policy" IdentityColumnName="WP_lPolicy_Id" MasterEntity="Policy">
+      <SelectCondition>WP_lPolicy_Id in (select distinct WP_lWeb_Land_Policy from WP_Web_Policy_Air_Land where isnull(WP_lPolicy_Id, 0) = {0})</SelectCondition>
+    </Entity>
+    <Entity Name="AirLandPolicyMap" TableName="WP_Web_Policy_Air_Land" IdentityColumnName="WP_lAirLand_Id">
+      <References>
+        <Reference OwnColumnName="WP_lPolicy_Id" ReferredEntityName="Policy" ReferredColumnName="WP_lPolicy_Id"/>
+        <Reference OwnColumnName="WP_lWeb_Land_Policy" ReferredEntityName="SubLandPolicy" ReferredColumnName="WP_lPolicy_Id"/>
+      </References>
+    </Entity>
+  </Entities>
+</EntityConfig>

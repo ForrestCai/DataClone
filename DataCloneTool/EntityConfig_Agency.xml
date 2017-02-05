@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EntityConfig>
+  <Entities>
+    <Entity Name="Agency" TableName="CD_Agency" IdentityColumnName="CD_lAgency_Code">
+    </Entity>
+    <Entity Name="Debtor" TableName="DB_Master" IdentityColumnName="DB_lDebtor_Code">
+      <References>
+        <Reference OwnColumnName="DB_lAgency_Code" ReferredEntityName="Agency" ReferredColumnName="CD_lAgency_Code"/>
+      </References>
+      <Restrictions>
+        <Restriction ColumnName="DB_lDebtor_Code" Value="6462"/>
+      </Restrictions>
+    </Entity>
+    <Entity Name="Profile" TableName="CL_Profile" IdentityColumnName="CL_lClient_Profile_Code">
+      <References>
+        <Reference OwnColumnName="CL_lDebtor_Code" ReferredEntityName="Debtor" ReferredColumnName="DB_lDebtor_Code"/>
+      </References>
+    </Entity>
+    <Entity Name="User" TableName="US_User_Details" IdentityColumnName="US_lUserName_Code">
+      <References>
+        <Reference OwnColumnName="US_lDebtor_Id" ReferredEntityName="Debtor" ReferredColumnName="DB_lDebtor_Code"/>
+      </References>
+    </Entity>
+    <Entity Name="UserProfileMap" TableName="UP_User_Profile">
+      <References>
+        <Reference OwnColumnName="UP_lUser_Id" ReferredEntityName="User" ReferredColumnName="US_lUserName_Code"/>
+        <Reference OwnColumnName="UP_lProfile_Id" ReferredEntityName="Profile" ReferredColumnName="CL_lClient_Profile_Code"/>
+      </References>
+    </Entity>
+    <Entity Name="Role" TableName="RL_Role" IdentityColumnName="RL_lRole_Id" Global="true" UniqueColumnName="RL_sRole">
+    </Entity>
+    <Entity Name="UserRole" TableName="UR_User_Role">
+      <References>
+        <Reference OwnColumnName="UR_lRole_Id" ReferredEntityName="Role" ReferredColumnName="RL_lRole_Id"/>
+        <Reference OwnColumnName="UR_lUser_Id" ReferredEntityName="User" ReferredColumnName="US_lUserName_Code"/>
+      </References>
+    </Entity>
+    <Entity Name="GlobalAgency" TableName="CD_Agency" IdentityColumnName="CD_lAgency_Code" Global="true" UniqueColumnName="CD_sAgency">
+    </Entity>
+    <Entity Name="SubDebtor" TableName="DB_Master" IdentityColumnName="DB_lDebtor_Code" MasterEntity="Debtor">
+      <References>
+        <Reference OwnColumnName="DB_lAgency_Code" ReferredEntityName="GlobalAgency" ReferredColumnName="CD_lAgency_Code"/>
+      </References>
+      <SelectCondition>DB_lDebtor_Code in (select distinct DB_lFrom_Debtor from DB_Link where isnull(DB_lTo_Debtor, 0) = {0})</SelectCondition>
+    </Entity>
+    <Entity Name="DebtorLink" TableName="DB_Link" IdentityColumnName="DB_lLink_Key">
+      <References>
+        <Reference OwnColumnName="DB_lTo_Debtor" ReferredEntityName="Debtor" ReferredColumnName="DB_lDebtor_Code"/>
+        <Reference OwnColumnName="DB_lFrom_Debtor" ReferredEntityName="SubDebtor" ReferredColumnName="DB_lDebtor_Code"/>
+      </References>
+    </Entity>
+  </Entities>
+</EntityConfig>

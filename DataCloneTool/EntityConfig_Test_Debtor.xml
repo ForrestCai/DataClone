@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EntityConfig>
+  <Entities>
+    <Entity Name="Agency" TableName="CD_Agency" IdentityColumnName="ID" Global="true" UniqueColumnName="Code">
+    </Entity>
+    <Entity Name="Debtor" TableName="DB_Master" IdentityColumnName="ID">
+      <References>
+        <Reference OwnColumnName="AgencyId" ReferredEntityName="Agency" ReferredColumnName="ID"/>
+      </References>
+    </Entity>
+    <Entity Name="Profile" TableName="CL_Profile" IdentityColumnName="ID">
+      <References>
+          <Reference OwnColumnName="DebtorId" ReferredEntityName="Debtor" ReferredColumnName="ID"/>
+      </References>
+    </Entity>
+    <Entity Name="UserProfileMap" TableName="UP_User_Profile" IdentityColumnName="ID">
+      <References>
+        <Reference OwnColumnName="UserId" ReferredEntityName="User" ReferredColumnName="ID"/>
+        <Reference OwnColumnName="ProfileId" ReferredEntityName="Profile" ReferredColumnName="ID"/>
+      </References>
+    </Entity>
+    <Entity Name="ProfileEmail" TableName="PE_Profile_Email" IdentityColumnName="ID">
+      <References>
+        <Reference OwnColumnName="ProfileId" ReferredEntityName="Profile" ReferredColumnName="ID"/>
+      </References>
+    </Entity>
+    <Entity Name="User" TableName="US_User" IdentityColumnName="ID">
+      <References>
+        <Reference OwnColumnName="DebtorId" ReferredEntityName="Debtor" ReferredColumnName="ID"/>
+      </References>
+    </Entity>
+    <Entity Name="DebtorOption" TableName="OP_DebtorOption" IdentityColumnName="ID">
+      <References>
+        <Reference OwnColumnName="DebtorCode" ReferredEntityName="Debtor" ReferredColumnName="Code"/>
+      </References>
+    </Entity>
+    <Entity Name="ProfileOption" TableName="OP_ProfileOption" IdentityColumnName="ID" Global="true" UniqueColumnName="Code">
+    </Entity>
+    <Entity Name="ProfileOptionData" TableName="PO_ProfileOption_Data" IdentityColumnName="ID">
+      <References>
+        <Reference OwnColumnName="ProfileId" ReferredEntityName="Profile" ReferredColumnName="ID"/>
+        <Reference OwnColumnName="OptionId" ReferredEntityName="ProfileOption" ReferredColumnName="ID"/>
+      </References>
+    </Entity>
+    <Entity Name="SubDebtor" TableName="DB_Master" IdentityColumnName="ID" MasterEntity="Debtor">
+      <References>
+        <Reference OwnColumnName="AgencyId" ReferredEntityName="Agency" ReferredColumnName="ID"/>
+      </References>
+      <SelectCondition>ID in (select distinct FromDebtorId from DB_Link where isnull(ToDebtorId, 0) = {0})</SelectCondition>
+    </Entity>
+    <Entity Name="DebtorLink" TableName="DB_Link" IdentityColumnName="ID">
+      <References>
+        <Reference OwnColumnName="ToDebtorId" ReferredEntityName="Debtor" ReferredColumnName="ID"/>
+        <Reference OwnColumnName="FromDebtorId" ReferredEntityName="SubDebtor" ReferredColumnName="ID"/>
+      </References>
+    </Entity>
+  </Entities>
+</EntityConfig>
